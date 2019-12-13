@@ -18,11 +18,11 @@ def transform(data):
     ds.add_formula('(tottrdval/totaltrades)', col_name='qtrd')
     ds.add_pct_change(on='close', col_name='ret')
     for col in ['ret', 'tottrdval', 'perdel', 'qtrd']:
-        ds.add_lag(on=col, period=1, col_name='prev'+col) 
+        ds.add_lag(on=col, period=1, col_name='prev_'+col) 
     return ds.data
 
 
-def create_files(index_file, data_file, output_dir):
+def create_files(index_file, data_file, output_dir, is_transform=False):
     """
     Create the files necessary for running the backtest
     index_file
@@ -32,10 +32,15 @@ def create_files(index_file, data_file, output_dir):
         single key named as data
     output_dir
         output directory to save the files
+    is_transform
+        Boolean - True/False
+        Whether to transform the data. If True, data transformations
+        are applied with the default function and then saved
+
     Note
     ----
-    This function reads each key of the index file and does
-    a merge on the data_file and then saves them as 
+    This function reads data from each key of the index file and does
+    a merge on the data_file with all the data and then saves them as 
     individual files in the output directory
     """
     store = pd.HDFStore(index_file)
@@ -43,6 +48,8 @@ def create_files(index_file, data_file, output_dir):
     for key in store.keys():
         index_data = store.get(key)
         df = index_data.merge(data, on=['date', 'symbol'])
+        if is_transform:
+            df = transform(df)
         # No slashes since its already included in key
         filename = '{o}{fn}.h5'.format(o=output_dir, fn=key)
         print(filename)
@@ -57,7 +64,7 @@ def main():
     INDEX_FILE = config['index_file']
     DATA_FILE = config['data_file']
     OUTPUT_DIR = config['output_dir']
-    create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR)
+    create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)
 
 if __name__ == "__main__":
     main()
