@@ -2,3 +2,4 @@
 index_file: INDEX_FILE
 data_file: DATA_FILE
 output_dir: OUTPUT_DIR
+is_data: False

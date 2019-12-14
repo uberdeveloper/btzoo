@@ -4,6 +4,7 @@ import yaml
 import hashlib
 from itertools import product
 from fastbt.datasource import DataSource
+from fastbt.rapid import backtest
 
 def transform(data):
     """
@@ -170,18 +171,25 @@ def load_data(datapath):
                 data_dict[key] = pd.read_hdf(filename)
     return data_dict
 
-def main():
-    # Expect a config.yaml in the present working directory
-    create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)
-    all_parameters = create_parameters()
-    data = load_data(OUTPUT_DIR)
+def runner(params):
+    pass
 
+
+def main():    
+    if not(IS_DATA):
+        # create data if already not created
+        create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)    
+    data = load_data(OUTPUT_DIR)
+    all_parameters = create_parameters()
 
 if __name__ == "__main__":
-    # Set all GLOBAL CONSTANTS here
+    
+    # Expect a config.yaml in the present working directory
     with open('config.yaml') as f:
         config = yaml.safe_load(f)
+    # Set all GLOBAL CONSTANTS here
     INDEX_FILE = config['index_file']
     DATA_FILE = config['data_file']
     OUTPUT_DIR = config['output_dir']
+    IS_DATA = config['is_data']
     main()

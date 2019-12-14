@@ -24,6 +24,10 @@ a HDF5 file with all data. The file must only have a single key
 output directory to save files.
 Separate files are generated for each of the indices
 
+### is_data
+True if the data files are already created; False if not created.
+If False, the files are again created
+
 ## parameters.yaml file
 
 Parameters.yaml file contains the set of parameters to iterate.
