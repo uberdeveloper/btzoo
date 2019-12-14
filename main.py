@@ -3,6 +3,7 @@ import os
 import yaml
 import json
 import hashlib
+import concurrent.futures
 from itertools import product
 from fastbt.datasource import DataSource
 from fastbt.rapid import backtest
@@ -177,9 +178,11 @@ def runner(data, universe, params):
     p['universe'] = universe
     identifier = get_hash(p)
     results = backtest(data=data, **params)
+    print(p)
     with open('output/parameters/{}.json'.format(identifier), 'w') as f:
         json.dump(p, f)
-    results.to_hdf('output/results/{}.h5'.format(identifier), format='fixed')
+    results.to_hdf('output/results/{}.h5'.format(identifier),
+        key='data', format='fixed')
 
 def main():    
     if not(IS_DATA):
@@ -187,6 +190,11 @@ def main():
         create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)    
     datas = load_data(OUTPUT_DIR)
     all_parameters = create_parameters()
+    for k,v in datas.items():
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for params in all_parameters:
+                executor.submit(runner, v, k, params)
+
 
 if __name__ == "__main__":
     
