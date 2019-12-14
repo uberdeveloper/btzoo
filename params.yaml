@@ -1,0 +1,17 @@
+stop_loss: [1,2]
+limit: [3,5]
+sort_mode: True
+order:
+  B:
+   price: price+0.10
+   conditions:
+    - pret < 0
+    - dret > 0
+    - (pret > 0) & (rmax3==rmax5)
+  S:
+   price: 
+    - price+0.1
+    - price-0.1
+   conditions:
+    - pret > 0
+    - del > 0.5

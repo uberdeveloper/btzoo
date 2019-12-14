@@ -114,6 +114,36 @@ def generate_parameters(lsts):
         return empty_dict
     return [inner(x) for x in all_dcts]
 
+def create_parameters(filename='params.yaml'):
+    """
+    Creates a list of parameters for running the backtest 
+    function in batch
+    filename
+        full path to the params.yaml file. If not specified,
+        the file in the present working directory is taken
+    returns a list of parameters as dictionary
+    Note
+    ----
+    This function does the following
+    1) Load the yaml file
+    2) Unpack the parameters
+    3) Generate the parameters for the backtest function
+    """
+    with open(filename, 'r') as f:
+        params = yaml.safe_load(f)
+    list_of_params = unpack_parameters(params)
+    # Generate parameters for keys without nesting
+    singular = generate_parameters(list_of_params[:-1])
+    # Generate parameters for keys with nesting
+    # This is assumed to be the last list by default
+    all_parameters = []
+    for nested_params in list_of_params[-1]:
+        N = generate_parameters(nested_params)
+        merged_params = generate_parameters([singular, N])
+        all_parameters.extend(merged_params)
+    return all_parameters
+
+
 def main():
     # Expect a config.yaml in the present working directory
     with open('config.yaml') as f:
@@ -123,6 +153,7 @@ def main():
     DATA_FILE = config['data_file']
     OUTPUT_DIR = config['output_dir']
     create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)
+    print(create_parameters())
 
 if __name__ == "__main__":
     main()
