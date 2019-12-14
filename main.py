@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import yaml
+from itertools import product
 from fastbt.datasource import DataSource
 
 def transform(data):
@@ -83,6 +84,35 @@ def unpack_parameters(dict_of_parameters, key1=None):
             L = unpack_parameters(v, key1=k)
             lst.append(L)
     return lst
+
+def generate_parameters(lsts):
+    """
+    Given a list of dictionaries, generate a combined list of
+    all possible parameters
+    lsts
+        list of dictionaries from unpack_parameters function
+    returns a list of dictionaries that could be passed on to
+    the backtest function as kwargs
+    Note
+    -----
+    1) Expects each list to have dictionaries. Flatten in case
+    of multiple lists
+    2) This doesn't yield a generator and all the possible options
+    are loaded into memory.
+    3) In case of lists with repeated arguments, the last argument
+    is taken as valid
+    """
+    all_dcts = list(product(*lsts))  
+    def inner(X):
+        """
+        an inner function that takes the list of dictionaries,
+        unpacks them and creates one single dictionary
+        """
+        empty_dict = {}
+        for m in X:
+            empty_dict.update(m)
+        return empty_dict
+    return [inner(x) for x in all_dcts]
 
 def main():
     # Expect a config.yaml in the present working directory
