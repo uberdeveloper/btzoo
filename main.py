@@ -153,17 +153,35 @@ def get_hash(params_dict):
     txt = str(params_dict).encode()
     return hashlib.sha1(txt).hexdigest()
 
+def load_data(datapath):
+    """
+    Load all HDF5 files with extension h5 in the given directory
+    datapath
+        directory path for the files; usually the output directory
+    returns a dictionary with all the HDF5 files loaded
+    """
+    data_dict = {}
+    ext = 'h5'
+    for root,directory,files in os.walk(datapath):
+        for file in files:
+            if file.endswith(ext):
+                key = file.split('.')[0]
+                filename = os.path.join(root, file)
+                data_dict[key] = pd.read_hdf(filename)
+    return data_dict
 
 def main():
     # Expect a config.yaml in the present working directory
+    create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)
+    all_parameters = create_parameters()
+    data = load_data(OUTPUT_DIR)
+
+
+if __name__ == "__main__":
+    # Set all GLOBAL CONSTANTS here
     with open('config.yaml') as f:
         config = yaml.safe_load(f)
-    print(config)
     INDEX_FILE = config['index_file']
     DATA_FILE = config['data_file']
     OUTPUT_DIR = config['output_dir']
-    create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)
-    all_parameters = create_parameters()
-
-if __name__ == "__main__":
     main()
