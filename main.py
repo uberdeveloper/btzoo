@@ -176,13 +176,31 @@ def load_data(datapath):
 def runner(data, universe, params):
     p = params.copy()
     p['universe'] = universe
+    params_path = os.path.join(os.getenv('HOME'), 'output', 'parameters')
+    results_path = os.path.join(os.getenv('HOME'), 'output', 'results')
     identifier = get_hash(p)
     results = backtest(data=data, **params)
     print(p)
-    with open('output/parameters/{}.json'.format(identifier), 'w') as f:
+    with open('{}/{}.json'.format(params_path, identifier), 'w') as f:
         json.dump(p, f)
-    results.to_hdf('output/results/{}.h5'.format(identifier),
+    results.to_hdf('{}/{}.h5'.format(results_path, identifier),
         key='data', format='fixed')
+
+def check_paths():
+    """
+    Check whether output path exists for saving files
+    exist and if not, create the respective directories
+    """
+    home = os.getenv('HOME')
+    paths = [
+        os.path.join(home, 'output'),
+        os.path.join(home, 'output', 'parameters'),
+        os.path.join(home, 'output', 'results')
+    ]
+    for pth in paths:
+        if not(os.path.exists(pth)):
+            os.mkdir(pth)
+
 
 def main():    
     if not(IS_DATA):
@@ -190,6 +208,7 @@ def main():
         create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)    
     datas = load_data(OUTPUT_DIR)
     all_parameters = create_parameters()
+    check_paths()
     for k,v in datas.items():
         with concurrent.futures.ProcessPoolExecutor() as executor:
             for params in all_parameters:
