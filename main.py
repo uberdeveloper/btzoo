@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import yaml
+import hashlib
 from itertools import product
 from fastbt.datasource import DataSource
 
@@ -143,6 +144,15 @@ def create_parameters(filename='params.yaml'):
         all_parameters.extend(merged_params)
     return all_parameters
 
+def get_hash(params_dict):
+    """
+    Get a unique has for the given dictionary
+    params_dict
+        a python dictionary
+    """
+    txt = str(params_dict).encode()
+    return hashlib.sha1(txt).hexdigest()
+
 
 def main():
     # Expect a config.yaml in the present working directory
@@ -153,7 +163,7 @@ def main():
     DATA_FILE = config['data_file']
     OUTPUT_DIR = config['output_dir']
     create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)
-    print(create_parameters())
+    all_parameters = create_parameters()
 
 if __name__ == "__main__":
     main()
