@@ -56,6 +56,34 @@ def create_files(index_file, data_file, output_dir, is_transform=False):
         df.to_hdf(filename, key='data', format='fixed')
     store.close()
 
+
+def unpack_parameters(dict_of_parameters, key1=None):
+    """
+    Generate a list of parameters for backtest function
+    dict_of_parameters
+        dictionary of parameters in the given format
+        see the README files for details
+    Given a list of parameters, unpack them into list of
+    dictionareis for further function
+    Note
+    -----
+    1) This is not a generalized function
+    """
+    lst = []
+    d = dict_of_parameters.copy()
+    for k,v in d.items():
+        if isinstance(v, (str, int, float)):
+            lst.append([{k:v}])
+        elif isinstance(v, list):
+            L = [{k:l} for l in v]
+            lst.append(L)
+        elif isinstance(v, dict):
+            if key1:
+                v[key1] = k
+            L = unpack_parameters(v, key1=k)
+            lst.append(L)
+    return lst
+
 def main():
     # Expect a config.yaml in the present working directory
     with open('config.yaml') as f:
