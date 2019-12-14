@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import yaml
+import json
 import hashlib
 from itertools import product
 from fastbt.datasource import DataSource
@@ -171,15 +172,20 @@ def load_data(datapath):
                 data_dict[key] = pd.read_hdf(filename)
     return data_dict
 
-def runner(params):
-    pass
-
+def runner(data, universe, params):
+    p = params.copy()
+    p['universe'] = universe
+    identifier = get_hash(p)
+    results = backtest(data=data, **params)
+    with open('output/parameters/{}.json'.format(identifier), 'w') as f:
+        json.dump(p, f)
+    results.to_hdf('output/results/{}.h5'.format(identifier), format='fixed')
 
 def main():    
     if not(IS_DATA):
         # create data if already not created
         create_files(INDEX_FILE, DATA_FILE, OUTPUT_DIR, is_transform=True)    
-    data = load_data(OUTPUT_DIR)
+    datas = load_data(OUTPUT_DIR)
     all_parameters = create_parameters()
 
 if __name__ == "__main__":
