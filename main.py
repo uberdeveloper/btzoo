@@ -145,6 +145,9 @@ def create_parameters(filename='params.yaml'):
         N = generate_parameters(nested_params)
         merged_params = generate_parameters([singular, N])
         all_parameters.extend(merged_params)
+    # Sort all by keys for hashing purpose
+    all_parameters = [{k:v for k,v in sorted(p.items(), key=lambda x:x[0])}
+    for p in all_parameters]
     return all_parameters
 
 def get_hash(params_dict):
@@ -152,7 +155,9 @@ def get_hash(params_dict):
     Get a unique has for the given dictionary
     params_dict
         a python dictionary
-    """
+    TO DO:
+    Add sort for hash
+    """    
     txt = str(params_dict).encode()
     return hashlib.sha1(txt).hexdigest()
 
@@ -180,7 +185,6 @@ def runner(data, universe, params):
     results_path = os.path.join(os.getenv('HOME'), 'output', 'results')
     identifier = get_hash(p)
     results = backtest(data=data, **params)
-    print(p)
     with open('{}/{}.json'.format(params_path, identifier), 'w') as f:
         json.dump(p, f)
     results.to_hdf('{}/{}.h5'.format(results_path, identifier),
@@ -211,8 +215,9 @@ def main():
     check_paths()
     for k,v in datas.items():
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            for params in all_parameters:
+            for i,params in enumerate(all_parameters):
                 executor.submit(runner, v, k, params)
+                print(k,i,params)
 
 
 if __name__ == "__main__":
