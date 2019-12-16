@@ -21,8 +21,12 @@ def transform(data):
     ds.add_formula('(open/prevclose)-1', col_name='pret')
     ds.add_formula('(close/open)-1', col_name='idret')
     ds.add_formula('(tottrdval/totaltrades)', col_name='qtrd')
-    ds.add_pct_change(on='close', col_name='ret')
-    for col in ['ret', 'tottrdval', 'perdel', 'qtrd']:
+    for i in [1,2,3]:
+        ds.add_pct_change(on='close', period=i, col_name='ret'+str(i))
+    for i in [2,3]:
+        ds.add_rolling(on='tottrdval', window=i, col_name='vol'+str(i),
+            function='sum', lag=1)
+    for col in ['tottrdval', 'perdel', 'qtrd']:
         ds.add_lag(on=col, period=1, col_name='prev_'+col) 
     return ds.data
 
