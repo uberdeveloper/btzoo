@@ -221,7 +221,7 @@ def main():
     counter = 0
     for k,v in datas.items():
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            for i,params in enumerate(all_parameters):
+            for params in all_parameters:
                 counter+=1
                 executor.submit(runner, v, k, params, counter)
 
