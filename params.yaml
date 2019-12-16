@@ -3,11 +3,11 @@ limit: [3,5]
 sort_mode: True
 order:
   B:
-    price: price+0.10
+    price: open+0.10
     conditions:
       - [pret>0]
       - [pret>0, rmax3 == rmax5]
   S:
-    price: [price+0.10, price-0.05]
+    price: [open+0.10, open-0.05]
     conditions:
       - [pret<0]
