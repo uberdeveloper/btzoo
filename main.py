@@ -189,7 +189,7 @@ def runner(data, universe, params, counter):
     results_path = os.path.join(os.getenv('HOME'), 'output', 'results')
     identifier = get_hash(p)
     results = backtest(data=data, **params)
-    print(universe, counter, params)
+    print(counter, universe, params)
     with open('{}/{}.json'.format(params_path, identifier), 'w') as f:
         json.dump(p, f)
     results.to_hdf('{}/{}.h5'.format(results_path, identifier),
@@ -218,11 +218,11 @@ def main():
     datas = load_data(OUTPUT_DIR)
     all_parameters = create_parameters()
     check_paths()
-    counter = 1
+    counter = 0
     for k,v in datas.items():
-        with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-            for params in all_parameters:
-                counter += 1
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for i,params in enumerate(all_parameters):
+                counter+=1
                 executor.submit(runner, v, k, params, counter)
 
 
