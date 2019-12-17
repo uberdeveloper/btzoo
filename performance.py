@@ -37,9 +37,13 @@ def main():
 				byday = results.groupby('timestamp').net_profit.sum()
 				stats = pf.timeseries.perf_stats(byday/100000,
 					factor_returns=benchmark.chg)
-				dct.update(stats)
+				dct.update(stats.to_dict())
 				simple = metrics(results)
 				dct.update(simple)
+				dct['open==high'] = results.query('open==high').net_profit.sum()
+				dct['open==low'] = results.query('open==low').net_profit.sum()
+				by_year = byday.groupby(lambda x: x.year).sum()
+				dct.update(by_year.to_dict())
 
 if __name__ == "__main__":
 	main()
