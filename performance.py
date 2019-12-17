@@ -3,6 +3,7 @@ This module calculates different performance metrics for the
 backtests and saves them in a summary folder
 """
 import os
+import json
 import pandas as pd
 import numpy as np
 import pyfolio as pf
@@ -47,6 +48,7 @@ def all_metrics(result, benchmark):
 def main():
 	benchmark = get_benchmark()
 	DIR = '/media/machine/4E1EA2D152455460/temp/btzoo_results/results'
+	OUTPUT_DIR = '/media/machine/4E1EA2D152455460/temp/btzoo_results/summary'
 	counter = 0
 	for root,directory,files in os.walk(DIR):
 		for file in files:
@@ -54,6 +56,10 @@ def main():
 				filename = os.path.join(root, file)
 				results = pd.read_hdf(filename)
 				perf_stats = all_metrics(results, benchmark)
+				output_filename = os.path.join(OUTPUT_DIR, file.split('.')[0])+'.json'
+				print(output_filename)
+				with open(output_filename, 'w') as f:
+					json.dump(perf_stats, f)
 
 if __name__ == "__main__":
 	main()
