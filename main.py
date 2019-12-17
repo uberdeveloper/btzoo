@@ -22,7 +22,8 @@ def transform(data):
     ds.add_formula('(close/open)-1', col_name='idret')
     ds.add_formula('(tottrdval/totaltrades)', col_name='qtrd')
     for i in [1,2,3]:
-        ds.add_pct_change(on='close', period=i, col_name='ret'+str(i))
+        ds.add_pct_change(on='close', period=i, col_name='ret'+str(i),
+            lag=1)
     for i in [2,3]:
         ds.add_rolling(on='tottrdval', window=i, col_name='vol'+str(i),
             function='sum', lag=1)
