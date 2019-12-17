@@ -65,7 +65,8 @@ def main():
 				filename = os.path.join(root, file)
 				output_filename = os.path.join(OUTPUT_DIR, file.split('.')[0])+'.json'
 				counter+=1
-				with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+				# Using thread pool since this is an I/O bound task
+				with concurrent.futures.ThreadPoolExecutor() as executor:
 					executor.submit(runner, filename, output_filename, benchmark, counter)
 
 if __name__ == "__main__":
