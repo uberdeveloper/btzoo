@@ -40,8 +40,8 @@ def all_metrics(result, benchmark):
 	dct.update(stats.to_dict())
 	simple = metrics(result)
 	dct.update(simple)
-	dct['open==high'] = result.query('open==high').net_profit.sum()
-	dct['open==low'] = result.query('open==low').net_profit.sum()
+	dct['open_high'] = result.query('open==high').net_profit.sum()
+	dct['open_low'] = result.query('open==low').net_profit.sum()
 	by_year = byday.groupby(lambda x: x.year).sum()
 	dct.update(by_year.to_dict())
 	return dct
