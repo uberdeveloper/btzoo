@@ -56,6 +56,8 @@ def runner(filename, output_file, benchmark, counter):
 	with open(output_file, 'w') as f:
 		json.dump(perf_stats, f)
 
+
+
 def main():
 	benchmark = get_benchmark()
 	counter = 0
@@ -70,6 +72,13 @@ def main():
 					executor.submit(runner, filename, output_filename, benchmark, counter)
 
 if __name__ == "__main__":
+	try:
+		from google.cloud import storage
+		GOOGLE_CLOUD = True
+	except ImportError:
+		print('Google Cloud library not installed')
+		GOOGLE_CLOUD = False
+
 	DIR = '/media/machine/4E1EA2D152455460/temp/btzoo_results/results'
 	OUTPUT_DIR = '/media/machine/4E1EA2D152455460/temp/btzoo_results/summary'
 	main()
